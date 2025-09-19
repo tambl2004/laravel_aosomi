@@ -26,7 +26,7 @@ class AdminUserSeeder extends Seeder
         // Tạo user customer mẫu
         User::create([
             'name' => 'Customer',
-            'email' => 'vantamst97@gmail.com',
+            'email' => 'user@gmail.com',
             'password' => Hash::make('12345678'),
             'role' => 'user',
             'email_verified_at' => now(), // Đã xác thực email
