@@ -30,6 +30,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/cart/{product}', [\App\Http\Controllers\Customer\CartController::class, 'remove'])->name('cart.remove');
     Route::post('/cart/clear', [\App\Http\Controllers\Customer\CartController::class, 'clear'])->name('cart.clear');
     Route::get('/cart/info', [\App\Http\Controllers\Customer\CartController::class, 'info'])->name('cart.info');
+    
+    // Address routes
+    Route::resource('addresses', \App\Http\Controllers\Customer\AddressController::class);
+    Route::post('addresses/{address}/set-default', [\App\Http\Controllers\Customer\AddressController::class, 'setDefault'])->name('addresses.set-default');
+    
+    // Order routes
+    Route::get('/checkout', [\App\Http\Controllers\Customer\CheckoutController::class, 'index'])->name('checkout');
+    Route::post('/checkout', [\App\Http\Controllers\Customer\CheckoutController::class, 'store'])->name('checkout.store');
+    Route::get('/orders', [\App\Http\Controllers\Customer\OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [\App\Http\Controllers\Customer\OrderController::class, 'show'])->name('orders.show');
 });
 
 // Routes xác thực
@@ -73,6 +83,16 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     
     // Routes quản lý người dùng
     Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->except(['show']);
+    
+    // Routes quản lý đơn hàng
+    Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class)->except(['create', 'store', 'edit']);
+    Route::put('orders/{order}/status', [\App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('orders.update-status');
+    Route::get('orders/{order}/print', [\App\Http\Controllers\Admin\OrderController::class, 'print'])->name('orders.print');
+    Route::post('orders/export', [\App\Http\Controllers\Admin\OrderController::class, 'export'])->name('orders.export');
+    
+    // Routes báo cáo thống kê
+    Route::get('reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
+    Route::get('reports/export', [\App\Http\Controllers\Admin\ReportController::class, 'export'])->name('reports.export');
 });
 
 // Routes customer (yêu cầu đăng nhập, verified và role user)

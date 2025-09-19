@@ -40,27 +40,42 @@ class CheckoutController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'customer_name' => 'required|string|max:255',
-            'customer_email' => 'required|email|max:255',
-            'customer_phone' => 'required|string|max:20',
-            'customer_address' => 'required|string|max:500',
-            'customer_city' => 'required|string|max:100',
-            'customer_district' => 'required|string|max:100',
-            'customer_ward' => 'required|string|max:100',
+        // Validation rules
+        $rules = [
             'payment_method' => 'required|in:cod,bank_transfer,momo,zalopay',
             'notes' => 'nullable|string|max:1000',
-        ], [
-            'customer_name.required' => 'Họ tên không được để trống',
-            'customer_email.required' => 'Email không được để trống',
-            'customer_email.email' => 'Email không hợp lệ',
-            'customer_phone.required' => 'Số điện thoại không được để trống',
-            'customer_address.required' => 'Địa chỉ không được để trống',
-            'customer_city.required' => 'Tỉnh/Thành phố không được để trống',
-            'customer_district.required' => 'Quận/Huyện không được để trống',
-            'customer_ward.required' => 'Phường/Xã không được để trống',
+        ];
+
+        $messages = [
             'payment_method.required' => 'Phương thức thanh toán không được để trống',
-        ]);
+        ];
+
+        // Kiểm tra xem có chọn địa chỉ từ danh sách không
+        if ($request->address_id) {
+            // Chọn địa chỉ từ danh sách
+            $rules['address_id'] = 'required|exists:addresses,id';
+            $messages['address_id.required'] = 'Vui lòng chọn địa chỉ giao hàng';
+            $messages['address_id.exists'] = 'Địa chỉ không hợp lệ';
+        } else {
+            // Nhập địa chỉ thủ công
+            $rules['customer_name'] = 'required|string|max:255';
+            $rules['customer_email'] = 'required|email|max:255';
+            $rules['customer_phone'] = 'required|string|max:20';
+            $rules['customer_address'] = 'required|string|max:500';
+            $rules['customer_city'] = 'required|string|max:100';
+            $rules['customer_district'] = 'required|string|max:100';
+            $rules['customer_ward'] = 'required|string|max:100';
+            $messages['customer_name.required'] = 'Họ tên không được để trống';
+            $messages['customer_email.required'] = 'Email không được để trống';
+            $messages['customer_email.email'] = 'Email không hợp lệ';
+            $messages['customer_phone.required'] = 'Số điện thoại không được để trống';
+            $messages['customer_address.required'] = 'Địa chỉ không được để trống';
+            $messages['customer_city.required'] = 'Tỉnh/Thành phố không được để trống';
+            $messages['customer_district.required'] = 'Quận/Huyện không được để trống';
+            $messages['customer_ward.required'] = 'Phường/Xã không được để trống';
+        }
+
+        $request->validate($rules, $messages);
 
         $cartItems = Cart::with('product')
             ->where('user_id', auth()->id())
@@ -88,24 +103,47 @@ class CheckoutController extends Controller
             $shippingFee = 0; // Miễn phí vận chuyển
             $totalAmount = $subtotal + $shippingFee;
 
+            // Lấy thông tin địa chỉ
+            $addressData = [];
+            if ($request->address_id) {
+                // Lấy thông tin từ địa chỉ đã chọn
+                $address = \App\Models\Address::where('id', $request->address_id)
+                    ->where('user_id', auth()->id())
+                    ->firstOrFail();
+                
+                $addressData = [
+                    'customer_name' => $address->name,
+                    'customer_email' => auth()->user()->email, // Lấy email từ user
+                    'customer_phone' => $address->phone,
+                    'customer_address' => $address->address,
+                    'customer_city' => $address->city,
+                    'customer_district' => $address->district,
+                    'customer_ward' => $address->ward,
+                ];
+            } else {
+                // Sử dụng thông tin nhập thủ công
+                $addressData = [
+                    'customer_name' => $request->customer_name,
+                    'customer_email' => $request->customer_email,
+                    'customer_phone' => $request->customer_phone,
+                    'customer_address' => $request->customer_address,
+                    'customer_city' => $request->customer_city,
+                    'customer_district' => $request->customer_district,
+                    'customer_ward' => $request->customer_ward,
+                ];
+            }
+
             // Tạo đơn hàng
-            $order = Order::create([
+            $order = Order::create(array_merge($addressData, [
                 'order_number' => Order::generateOrderNumber(),
                 'user_id' => auth()->id(),
-                'customer_name' => $request->customer_name,
-                'customer_email' => $request->customer_email,
-                'customer_phone' => $request->customer_phone,
-                'customer_address' => $request->customer_address,
-                'customer_city' => $request->customer_city,
-                'customer_district' => $request->customer_district,
-                'customer_ward' => $request->customer_ward,
                 'subtotal' => $subtotal,
                 'shipping_fee' => $shippingFee,
                 'total_amount' => $totalAmount,
                 'payment_method' => $request->payment_method,
                 'status' => 'pending',
                 'notes' => $request->notes,
-            ]);
+            ]));
 
             // Tạo chi tiết đơn hàng
             foreach ($cartItems as $item) {
@@ -151,18 +189,5 @@ class CheckoutController extends Controller
         $order->load('orderItems.product');
 
         return view('customer.order-detail', compact('order'));
-    }
-
-    /**
-     * Hiển thị danh sách đơn hàng của user
-     */
-    public function index()
-    {
-        $orders = Order::with('orderItems')
-            ->where('user_id', auth()->id())
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
-
-        return view('customer.orders', compact('orders'));
     }
 }

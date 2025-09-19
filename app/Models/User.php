@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -97,5 +98,29 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getEmailForVerification(): string
     {
         return $this->email;
+    }
+
+    /**
+     * Quan hệ với Address
+     */
+    public function addresses(): HasMany
+    {
+        return $this->hasMany(Address::class);
+    }
+
+    /**
+     * Quan hệ với Order
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    /**
+     * Lấy địa chỉ mặc định
+     */
+    public function defaultAddress()
+    {
+        return $this->addresses()->default()->first();
     }
 }

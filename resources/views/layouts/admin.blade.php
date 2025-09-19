@@ -333,14 +333,14 @@
                             </a>
                         </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
+                        <a class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}">
                             <i class="fas fa-shopping-cart"></i>
                             Quản lý đơn hàng
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-chart-bar"></i>
+                        <a class="nav-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}" href="{{ route('admin.reports.index') }}">
+                            <i class="fas fa-chart-line"></i>
                             Báo cáo thống kê
                         </a>
                     </li>
