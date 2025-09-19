@@ -9,6 +9,29 @@ use App\Http\Controllers\Customer\HomeController as CustomerHomeController;
 // Trang chủ - redirect về customer home
 Route::get('/', [CustomerHomeController::class, 'index'])->name('home');
 
+// Routes trang công khai
+Route::get('/products', [CustomerHomeController::class, 'products'])->name('products');
+Route::get('/about', [CustomerHomeController::class, 'about'])->name('about');
+Route::get('/contact', [CustomerHomeController::class, 'contact'])->name('contact');
+
+// Routes giỏ hàng và yêu thích (yêu cầu đăng nhập)
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Wishlist routes
+    Route::get('/wishlist', [\App\Http\Controllers\Customer\WishlistController::class, 'index'])->name('wishlist.index');
+    Route::post('/wishlist/toggle', [\App\Http\Controllers\Customer\WishlistController::class, 'toggle'])->name('wishlist.toggle');
+    Route::delete('/wishlist/{product}', [\App\Http\Controllers\Customer\WishlistController::class, 'remove'])->name('wishlist.remove');
+    Route::post('/wishlist/clear', [\App\Http\Controllers\Customer\WishlistController::class, 'clear'])->name('wishlist.clear');
+    Route::post('/wishlist/{product}/move-to-cart', [\App\Http\Controllers\Customer\WishlistController::class, 'moveToCart'])->name('wishlist.move-to-cart');
+    
+    // Cart routes
+    Route::get('/cart', [\App\Http\Controllers\Customer\CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add', [\App\Http\Controllers\Customer\CartController::class, 'add'])->name('cart.add');
+    Route::put('/cart/update', [\App\Http\Controllers\Customer\CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/{product}', [\App\Http\Controllers\Customer\CartController::class, 'remove'])->name('cart.remove');
+    Route::post('/cart/clear', [\App\Http\Controllers\Customer\CartController::class, 'clear'])->name('cart.clear');
+    Route::get('/cart/info', [\App\Http\Controllers\Customer\CartController::class, 'info'])->name('cart.info');
+});
+
 // Routes xác thực
 Route::middleware('guest')->group(function () {
     // Hiển thị form đăng ký và đăng nhập
@@ -35,7 +58,21 @@ Route::post('/email/resend', [AuthController::class, 'resendVerification'])
 // Routes admin (yêu cầu đăng nhập, verified và role admin)
 Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-    // Có thể thêm các routes admin khác ở đây
+    
+    // Routes quản lý danh mục (bỏ show)
+    Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class)->except(['show']);
+    
+    // Routes quản lý sản phẩm (bỏ show)
+    Route::resource('products', \App\Http\Controllers\Admin\ProductController::class)->except(['show']);
+    
+    // Routes bổ sung cho sản phẩm
+    Route::post('products/{product}/toggle-status', [\App\Http\Controllers\Admin\ProductController::class, 'toggleStatus'])
+        ->name('products.toggle-status');
+    Route::post('products/{product}/toggle-featured', [\App\Http\Controllers\Admin\ProductController::class, 'toggleFeatured'])
+        ->name('products.toggle-featured');
+    
+    // Routes quản lý người dùng
+    Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->except(['show']);
 });
 
 // Routes customer (yêu cầu đăng nhập, verified và role user)

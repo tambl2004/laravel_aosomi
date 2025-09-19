@@ -17,7 +17,7 @@ class AdminUserSeeder extends Seeder
         // Tạo user admin mẫu
         User::create([
             'name' => 'Admin',
-            'email' => 'admin@aosomi.com',
+            'email' => 'admin@gmail.com',
             'password' => Hash::make('12345678'),
             'role' => 'admin',
             'email_verified_at' => now(), // Đã xác thực email
@@ -26,14 +26,14 @@ class AdminUserSeeder extends Seeder
         // Tạo user customer mẫu
         User::create([
             'name' => 'Customer',
-            'email' => 'customer@aosomi.com',
+            'email' => 'vantamst97@gmail.com',
             'password' => Hash::make('12345678'),
             'role' => 'user',
             'email_verified_at' => now(), // Đã xác thực email
         ]);
 
         $this->command->info('Đã tạo user admin và customer mẫu thành công!');
-        $this->command->info('Admin: admin@aosomi.com / 12345678');
-        $this->command->info('Customer: customer@aosomi.com / 12345678');
+        $this->command->info('Admin: admin@gmail.com / 12345678');
+        $this->command->info('Customer: vantamst97@gmail.com / 12345678');
     }
 }
