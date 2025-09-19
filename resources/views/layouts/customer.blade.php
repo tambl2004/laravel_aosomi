@@ -166,18 +166,48 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
+                        <a class="nav-link" href="{{ route('home') }}">
+                            <i class="fas fa-home me-1"></i>Trang chủ
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{{ route('customer.dashboard') }}">
                             <i class="fas fa-tachometer-alt me-1"></i>Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-shopping-cart me-1"></i>Đơn hàng
+                        <a class="nav-link" href="{{ route('products') }}">
+                            <i class="fas fa-box me-1"></i>Sản phẩm
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
+                        <a class="nav-link" href="{{ route('orders.index') }}">
+                            <i class="fas fa-shopping-cart me-1"></i>Đơn hàng của tôi
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('addresses.index') }}">
+                            <i class="fas fa-map-marker-alt me-1"></i>Địa chỉ của tôi
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('wishlist.index') }}">
                             <i class="fas fa-heart me-1"></i>Yêu thích
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('cart.index') }}">
+                            <i class="fas fa-shopping-bag me-1"></i>Giỏ hàng
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('contact') }}">
+                            <i class="fas fa-envelope me-1"></i>Liên hệ
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('about') }}">
+                            <i class="fas fa-info-circle me-1"></i>Về chúng tôi
                         </a>
                     </li>
                 </ul>
@@ -188,6 +218,16 @@
                             <i class="fas fa-user-circle me-1"></i>{{ Auth::user() ? Auth::user()->name : 'Khách' }}
                         </a>
                         <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ route('home') }}"><i class="fas fa-home me-2"></i>Trang chủ</a></li>
+                            <li><a class="dropdown-item" href="{{ route('customer.dashboard') }}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
+                            <li><a class="dropdown-item" href="{{ route('products') }}"><i class="fas fa-box me-2"></i>Sản phẩm</a></li>
+                            <li><a class="dropdown-item" href="{{ route('orders.index') }}"><i class="fas fa-shopping-cart me-2"></i>Đơn hàng của tôi</a></li>
+                            <li><a class="dropdown-item" href="{{ route('addresses.index') }}"><i class="fas fa-map-marker-alt me-2"></i>Địa chỉ của tôi</a></li>
+                            <li><a class="dropdown-item" href="{{ route('wishlist.index') }}"><i class="fas fa-heart me-2"></i>Yêu thích</a></li>
+                            <li><a class="dropdown-item" href="{{ route('cart.index') }}"><i class="fas fa-shopping-bag me-2"></i>Giỏ hàng</a></li>
+                            <li><a class="dropdown-item" href="{{ route('contact') }}"><i class="fas fa-envelope me-2"></i>Liên hệ</a></li>
+                            <li><a class="dropdown-item" href="{{ route('about') }}"><i class="fas fa-info-circle me-2"></i>Về chúng tôi</a></li>
+                            <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Thông tin cá nhân</a></li>
                             <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
                             <li><hr class="dropdown-divider"></li>
