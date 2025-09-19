@@ -23,6 +23,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'role',
+        'email_verified_at',
     ];
 
     /**
@@ -62,5 +63,39 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isUser(): bool
     {
         return $this->role === 'user';
+    }
+
+    /**
+     * Kiểm tra user có role cụ thể không
+     */
+    public function hasRole(string $role): bool
+    {
+        return $this->role === $role;
+    }
+
+    /**
+     * Đánh dấu email đã được xác thực
+     */
+    public function markEmailAsVerified(): bool
+    {
+        return $this->forceFill([
+            'email_verified_at' => $this->freshTimestamp(),
+        ])->save();
+    }
+
+    /**
+     * Kiểm tra email đã được xác thực chưa
+     */
+    public function hasVerifiedEmail(): bool
+    {
+        return !is_null($this->email_verified_at);
+    }
+
+    /**
+     * Lấy email để xác thực
+     */
+    public function getEmailForVerification(): string
+    {
+        return $this->email;
     }
 }
